@@ -2,7 +2,7 @@
 
 # 🧠 QuickBrain for PowerToys Run
 
-<img src="QuickBrain/Community.PowerToys.Run.Plugin.QuickBrain/Images/quickbrain.light.png" alt="QuickBrain Icon" width="128" height="128">
+<img src="QuickBrain/Community.PowerToys.Run.Plugin.QuickBrain/Images/quickbrain.logo.png" alt="QuickBrain Icon" width="128" height="128">
 
 ### ⚡ Smart Calculator with AI-Powered Intelligence ⚡
 
