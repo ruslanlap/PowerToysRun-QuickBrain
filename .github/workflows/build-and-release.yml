@@ -128,7 +128,7 @@ jobs:
           cat > release_notes.md << EOL
           # 🧠 QuickBrain v${VERSION} – Smart Calculator Unleashed!
           <p align="center">
-            <img src="https://github.com/ruslanlap/PowerToysRun-QuickBrain/raw/main/QuickBrain/Community.PowerToys.Run.Plugin.QuickBrain/Images/quickbrain.light.png" width="128" alt="QuickBrain Logo"/>
+            <img src="https://github.com/ruslanlap/PowerToysRun-QuickBrain/raw/master/QuickBrain/Community.PowerToys.Run.Plugin.QuickBrain/Images/quickbrain.light.png" width="128" alt="QuickBrain Logo"/>
           </p>
 
           ## ✨ What's New
