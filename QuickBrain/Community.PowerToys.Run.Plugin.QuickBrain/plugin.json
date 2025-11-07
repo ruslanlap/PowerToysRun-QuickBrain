@@ -6,7 +6,7 @@
   "Author": "ruslanlap",
   "Version": "1.0.0",
   "Language": "csharp",
-  "Website": "https://github.com/hlaueriksson/PowerToysRun-QuickBrain",
+  "Website": "https://github.com/ruslanlap/PowerToysRun-QuickBrain",
   "ExecuteFileName": "Community.PowerToys.Run.Plugin.QuickBrain.dll",
   "IcoPathDark": "Images\\quickbrain.dark.png",
   "IcoPathLight": "Images\\quickbrain.light.png",

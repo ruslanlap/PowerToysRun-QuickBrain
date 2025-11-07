@@ -207,6 +207,13 @@ Alt+Space → qb ai explain recursion   # 🤖 AI assistance
 
 ---
 
+## 📦 Installation
+
+1. **Download** the latest `QuickBrain-1.0.0-x64.zip` (or `QuickBrain-1.0.0-arm64.zip`) from the [releases page](https://github.com/ruslanlap/PowerToysRun-QuickBrain/releases/latest).
+2. **Extract** the archive into `%LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Plugins\QuickBrain` (create the folder if it does not exist).
+3. **Restart PowerToys** (exit from the tray icon and start it again) so the plugin is discovered.
+4. (Optional) **Enable the plugin** in *PowerToys Settings → PowerToys Run → Plugins* if it is not already active.
+
 ## 🏃‍♂️ Get Started in 60 Seconds
 
 ### 1️⃣ **Download & Extract** (15 seconds)
