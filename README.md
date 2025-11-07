@@ -4,7 +4,7 @@
 
 <img src="QuickBrain/Community.PowerToys.Run.Plugin.QuickBrain/Images/quickbrain.logo.png" alt="QuickBrain Icon" width="128" height="128">
 
-### ⚡ Smart Calculator with AI-Powered Intelligence ⚡
+### ⚡ Smart Converts, Commands, Calculations  with AI-Powered Intelligence ⚡
 
 **Never leave your workflow for calculations again.**  
 Access advanced math, unit conversions, date calculations, and AI assistance instantly with `Alt+Space` → `qb sin(pi/4)` → Done! ✨
