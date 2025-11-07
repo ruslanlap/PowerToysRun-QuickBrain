@@ -1,0 +1,14 @@
+{
+  "ID": "36FD3BCBE8684A548E91C95315804782",
+  "ActionKeyword": "qb",
+  "IsGlobal": false,
+  "Name": "QuickBrain",
+  "Author": "ruslanlap",
+  "Version": "1.0.0",
+  "Language": "csharp",
+  "Website": "https://github.com/hlaueriksson/PowerToysRun-QuickBrain",
+  "ExecuteFileName": "Community.PowerToys.Run.Plugin.QuickBrain.dll",
+  "IcoPathDark": "Images\\quickbrain.dark.png",
+  "IcoPathLight": "Images\\quickbrain.light.png",
+  "DynamicLoading": false
+}

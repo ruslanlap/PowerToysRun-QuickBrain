@@ -1,0 +1,207 @@
+name: 🧠 Build & Release QuickBrain PowerToys Plugin
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  PLUGIN_DIR: QuickBrain/Community.PowerToys.Run.Plugin.QuickBrain
+  ARTIFACT_PREFIX: QuickBrain
+
+permissions:
+  contents: write
+  issues: read
+  pull-requests: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        platform: [x64, arm64]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('QuickBrain/**/*.csproj') }}
+          restore-keys: ${{ runner.os }}-nuget-
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Get version
+        id: get_version
+        shell: bash
+        run: |
+          if [[ $GITHUB_REF == refs/tags/v* ]]; then
+            echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+            echo "IS_TAG=true" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=$(date +'%Y.%m.%d')-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_OUTPUT
+            echo "IS_TAG=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 🚀 Build & stage plugin
+        shell: pwsh
+        run: |
+          # 1. Inject version
+          $pluginJson = "${{ env.PLUGIN_DIR }}/plugin.json"
+          $content    = Get-Content $pluginJson -Raw | ConvertFrom-Json
+          $content.Version = "${{ steps.get_version.outputs.VERSION }}"
+          $content | ConvertTo-Json -Depth 10 | Set-Content $pluginJson -Encoding UTF8
+
+          # 2. Build
+          dotnet build "${{ env.PLUGIN_DIR }}/Community.PowerToys.Run.Plugin.QuickBrain.csproj" `
+            -c Release `
+            -p:Platform="${{ matrix.platform }}"
+
+          # 3. Locate binaries
+          $outDir = "${{ env.PLUGIN_DIR }}/bin/${{ matrix.platform }}/Release"
+          $netDir = Get-ChildItem $outDir -Directory -Filter "net*-windows*" |
+                    Select-Object -First 1 -ExpandProperty FullName
+          if (-not $netDir) { throw "Build output not found" }
+
+          # 4. Stage folder
+          $stage = "artifacts/${{ env.ARTIFACT_PREFIX }}-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}/${{ env.ARTIFACT_PREFIX }}"
+          New-Item $stage -ItemType Directory -Force | Out-Null
+
+          # 5. Copy files
+          Copy-Item "$netDir/*" $stage -Recurse -Exclude @(
+            "PowerToys*.dll","PowerToys*.pdb","Wox*.dll","Wox*.pdb"
+          )
+          Copy-Item $pluginJson $stage
+          Copy-Item "${{ env.PLUGIN_DIR }}/Images" $stage -Recurse -ErrorAction SilentlyContinue
+
+      - name: 📦 Zip & upload artifact
+        shell: pwsh
+        run: |
+          $zip = "artifacts/${{ env.ARTIFACT_PREFIX }}-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}.zip"
+          $src = "artifacts/${{ env.ARTIFACT_PREFIX }}-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}/${{ env.ARTIFACT_PREFIX }}"
+          Compress-Archive -Path $src -DestinationPath $zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts-${{ matrix.platform }}
+          path: artifacts/*.zip
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: downloaded-artifacts
+
+      - name: Prepare artifacts for release
+        run: |
+          mkdir -p release-artifacts
+          VERSION="${{ steps.get_version.outputs.VERSION }}"
+          cp downloaded-artifacts/build-artifacts-x64/${{ env.ARTIFACT_PREFIX }}-${VERSION}-x64.zip release-artifacts/
+          cp downloaded-artifacts/build-artifacts-arm64/${{ env.ARTIFACT_PREFIX }}-${VERSION}-arm64.zip release-artifacts/
+
+      - name: Prepare release notes
+        id: release_notes
+        run: |
+          VERSION="${{ steps.get_version.outputs.VERSION }}"
+          cat > release_notes.md << EOL
+          # 🧠 QuickBrain v${VERSION} – Smart Calculator Unleashed!
+          <p align="center">
+            <img src="https://github.com/ruslanlap/PowerToysRun-QuickBrain/raw/main/QuickBrain/Community.PowerToys.Run.Plugin.QuickBrain/Images/quickbrain.light.png" width="128" alt="QuickBrain Logo"/>
+          </p>
+
+          ## ✨ What's New
+          - 🧮 **Advanced Mathematical Operations** (trig, log, stats)
+          - 🔄 **Comprehensive Unit Conversions** (length, weight, temp, data)
+          - 📅 **Date Calculations** (differences, arithmetic, relative dates)
+          - 🤖 **AI Streaming Support** (OpenAI, Anthropic, HuggingFace, OpenRouter)
+          - 📜 **History Management** (track and search calculations)
+          - 💪 **Health & Money Calculators** (BMI, tips)
+          - 🔢 **Logic Evaluation** (boolean, bitwise operations)
+          - 🎨 **Theme-Aware Icons** (dark/light mode support)
+
+          ## 🚀 Install
+          1. Download ZIP for your architecture (x64 / ARM64)  
+          2. Extract to \`%LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Plugins\QuickBrain\`  
+          3. Restart PowerToys → press \`Alt+Space\` → type \`qb <calculation>\`
+
+          ## 💡 Quick Examples
+          | Command | Result |
+          |---------|--------|
+          | \`qb 2+2\` | Basic math: 4 |
+          | \`qb 100 km to miles\` | Unit conversion: 62.137 miles |
+          | \`qb sin(pi/4)\` | Trigonometry: 0.7071 |
+          | \`qb bmi 180cm 75kg\` | Health: BMI 23.15 |
+          | \`qb tip 15% 85.50\` | Money: Tip \$12.83 |
+          | \`qb days between 2024-01-01 and 2024-12-31\` | Date: 365 days |
+          | \`qb ai explain recursion\` | AI assistance (optional) |
+          | \`qb history\` | View calculation history |
+
+          ## 🔧 Configuration
+          - **Offline-First**: All core features work without internet
+          - **AI Integration**: Optional OpenAI, Anthropic, HuggingFace, OpenRouter support
+          - **Customizable**: Precision (0-28), angle units, history limit, themes
+          - **Settings**: Right-click any result → Open Settings
+
+          ## 📚 Documentation
+          Full documentation available in the [README](https://github.com/ruslanlap/PowerToysRun-QuickBrain#readme)
+
+          ## 💫 Contribute
+          Found a bug or have an idea? [Open an issue](https://github.com/ruslanlap/PowerToysRun-QuickBrain/issues)
+
+          Made with ❤️ by [ruslanlap](https://github.com/ruslanlap)
+          EOL
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
+          cat release_notes.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Generate SHA256 checksums
+        run: |
+          cd release-artifacts
+          VERSION="${{ steps.get_version.outputs.VERSION }}"
+          for f in *.zip; do
+            sha256sum "$f" | tee "$f.sha256"
+          done
+          {
+            echo "SHA256 Checksums for QuickBrain Plugin v${VERSION}"
+            echo "Generated on: $(date -u)"
+            echo
+            cat *.sha256
+          } > checksums.txt
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: QuickBrain v${{ steps.get_version.outputs.VERSION }}
+          body: ${{ steps.release_notes.outputs.RELEASE_NOTES }}
+          draft: false
+          prerelease: false
+          files: |
+            release-artifacts/${{ env.ARTIFACT_PREFIX }}-${{ steps.get_version.outputs.VERSION }}-x64.zip
+            release-artifacts/${{ env.ARTIFACT_PREFIX }}-${{ steps.get_version.outputs.VERSION }}-arm64.zip
+            release-artifacts/*.sha256
+            release-artifacts/checksums.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
