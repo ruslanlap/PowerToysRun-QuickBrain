@@ -34,9 +34,6 @@ Access advanced math, unit conversions, date calculations, and AI assistance ins
 <a href="https://opensource.org/licenses/MIT">
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">
 </a>
-<a href="https://github.com/hlaueriksson/awesome-powertoys-run-plugins">
-  <img src="https://awesome.re/mentioned-badge.svg" alt="Mentioned in Awesome PowerToys Run Plugins">
-</a>
 
 </div>
 
@@ -175,11 +172,6 @@ Alt+Space → qb ai explain recursion   # 🤖 AI assistance
 <img width="60" src="QuickBrain/Community.PowerToys.Run.Plugin.QuickBrain/Images/money.light.png">
 <br><b>💰 Money Calculations</b><br>
 <sub>Tip calculator,<br>percentage calculations</sub>
-</td>
-<td align="center" width="33%">
-<img width="60" src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Gear/3D/gear_3d.png">
-<br><b>⚙️ Highly Configurable</b><br>
-<sub>Customize precision, units,<br>AI providers, and more</sub>
 </td>
 </tr>
 </table>
@@ -983,7 +975,6 @@ If QuickBrain boosts your productivity, consider starring the repo and sharing w
 - 🐛 [Report bugs](https://github.com/ruslanlap/PowerToysRun-QuickBrain/issues)
 - 💡 [Request features](https://github.com/ruslanlap/PowerToysRun-QuickBrain/issues)  
 - 🤝 [Contribute](https://github.com/ruslanlap/PowerToysRun-QuickBrain/pulls)
-- 📢 [Awesome PowerToys Plugins](https://github.com/hlaueriksson/awesome-powertoys-run-plugins)
 
 </div>
 
