@@ -4,10 +4,10 @@
 
 <img src="QuickBrain/Community.PowerToys.Run.Plugin.QuickBrain/Images/quickbrain.logo.png" alt="QuickBrain Icon" width="128" height="128">
 
-### ⚡ Smart Converts, Commands, Calculations  with AI-Powered Intelligence ⚡
+### ⚡ Smart Converts, Commands, Calculations with AI-Powered Intelligence ⚡
 
 **Never leave your workflow for calculations again.**  
-Access advanced math, unit conversions, date calculations, and AI assistance instantly with `Alt+Space` → `qb sin(pi/4)` → Done! ✨
+Access advanced math, unit conversions, date calculations, !!! and AI assistance !!! instantly with `Alt+Space` → `qb sin(pi/4)` → Done! ✨
 
 <!-- Badges -->
 <a href="https://github.com/ruslanlap/PowerToysRun-QuickBrain/actions/workflows/build-and-release.yml"><img src="https://github.com/ruslanlap/PowerToysRun-QuickBrain/actions/workflows/build-and-release.yml/badge.svg" alt="Build Status"></a>
@@ -29,7 +29,6 @@ Access advanced math, unit conversions, date calculations, and AI assistance ins
 </a>
 <img src="https://img.shields.io/badge/Made%20with-❤️-red" alt="Made with Love">
 <img src="https://img.shields.io/badge/AI%20Powered-Yes-orange" alt="AI Powered">
-<img src="https://img.shields.io/badge/PowerToys-Compatible-blue" alt="PowerToys Compatible">
 <img src="https://img.shields.io/badge/platform-Windows-lightgrey" alt="Platform">
 <a href="https://opensource.org/licenses/MIT">
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">
@@ -58,8 +57,6 @@ Access advanced math, unit conversions, date calculations, and AI assistance ins
 
 <div align="center">
 
-**"Stop switching between calculator apps and browser tabs"**
-
 | ❌ Before | ✅ With QuickBrain |
 |-----------|-----------------|
 | Open calculator → Type → Copy → Switch back | `Alt+Space` → `qb sin(pi/4)` → Copy |
@@ -72,7 +69,8 @@ Access advanced math, unit conversions, date calculations, and AI assistance ins
 Alt+Space → qb 2+2                    # 🧮 Basic math
 Alt+Space → qb 100 km to miles        # 🔄 Unit conversion  
 Alt+Space → qb bmi 180cm 75kg         # 💪 Health calculations
-Alt+Space → qb ai explain recursion   # 🤖 AI assistance
+Alt+Space → qb ai explain recursion   # 🤖 AI assistance Ask anything
+Alt+Space → qb date today + 1 week    # 📅 Date calculations
 ```
 
 <div align="center">
@@ -101,15 +99,11 @@ Alt+Space → qb ai explain recursion   # 🤖 AI assistance
 - [Configuration](#-advanced-configuration)
 - [AI Integration](#-ai-integration)
 - [History Management](#-history-management)
-- [Building from Source](#-for-developers)
-- [Project Structure](#-project-structure)
 - [FAQ](#-faq)
 - [Troubleshooting](#-troubleshooting)
 - [Security & Privacy](#-privacy--security)
-- [Tech Stack](#-tech-stack)
 - [Contributing](#-contributing)
 - [Support the Project](#-community--support)
-- [License](#-license)
 - [Acknowledgements](#-acknowledgements)
 
 ## 📝 Overview
