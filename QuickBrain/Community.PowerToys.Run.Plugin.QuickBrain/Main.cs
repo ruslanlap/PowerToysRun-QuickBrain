@@ -79,19 +79,20 @@ namespace Community.PowerToys.Run.Plugin.QuickBrain
         {
             var results = new List<Result>();
 
+            // Declared outside try so they remain accessible in catch and post-try cache logic
+            var input = query?.Search?.Trim() ?? string.Empty;
+            bool isDynamicQuery = input.StartsWith("ai ", StringComparison.OrdinalIgnoreCase) ||
+                                 input.StartsWith("ask ", StringComparison.OrdinalIgnoreCase) ||
+                                 input.StartsWith("history", StringComparison.OrdinalIgnoreCase);
+
             try
             {
-                var input = query?.Search?.Trim() ?? string.Empty;
                 if (string.IsNullOrWhiteSpace(input))
                 {
                     return GetDefaultResults();
                 }
 
                 // Check cache first for non-dynamic queries (skip AI/history commands)
-                bool isDynamicQuery = input.StartsWith("ai ", StringComparison.OrdinalIgnoreCase) ||
-                                     input.StartsWith("ask ", StringComparison.OrdinalIgnoreCase) ||
-                                     input.StartsWith("history", StringComparison.OrdinalIgnoreCase);
-
                 if (!isDynamicQuery && _resultCache.TryGet(input, out var cachedResults))
                 {
                     return cachedResults;
@@ -206,6 +207,19 @@ namespace Community.PowerToys.Run.Plugin.QuickBrain
 
                 // Smart module routing with QueryClassifier
                 var priority = _classifier.GetModulePriority(input);
+
+                // Fallback: if classifier returned an empty list, use default module order
+                if (priority == null || priority.Count == 0)
+                {
+                    priority = new List<CalculationType>
+                    {
+                        CalculationType.Arithmetic,
+                        CalculationType.UnitConversion,
+                        CalculationType.DateCalculation,
+                        CalculationType.LogicEvaluation
+                    };
+                }
+
                 CalculationResult? calculationResult = null;
 
                 // Try modules in priority order (smart routing)
