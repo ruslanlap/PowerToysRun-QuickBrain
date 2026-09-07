@@ -1,0 +1,101 @@
+name: Stale Dependabot Auto-Close
+
+on:
+  schedule:
+    - cron: "0 4 * * 1"   # weekly Monday 04:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: stale-dependabot-close
+  cancel-in-progress: false
+
+jobs:
+  close:
+    runs-on: ubuntu-latest
+    env:
+      STALE_DAYS: 14
+      DRY_RUN: "false"
+    steps:
+      - name: List open Dependabot PRs and close the stale ones
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const STALE_DAYS = Number(process.env.STALE_DAYS);
+            const DRY_RUN = process.env.DRY_RUN === "true";
+            const KEEP_LABELS = new Set(["keep", "pinned", "do-not-close", "blocked", "in-progress"]);
+            const { data: pulls } = await github.rest.pulls.list({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: "open", per_page: 100,
+            });
+            const dependabot = pulls.filter(
+              (pr) => pr.user && pr.user.login.startsWith("dependabot"),
+            );
+            const cutoff = Date.now() - STALE_DAYS * 24 * 60 * 60 * 1000;
+            const closed = [];
+            for (const pr of dependabot) {
+              const labels = (pr.labels || []).map((l) => l.name);
+              if (labels.some((l) => KEEP_LABELS.has(l))) {
+                core.info(`#${pr.number} has keep-label (${labels.join(",")}), skipping`);
+                continue;
+              }
+              const { data: comments } = await github.rest.issues.listComments({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: pr.number, per_page: 100,
+              });
+              const hasHumanComment = comments.some(
+                (c) => c.user && !c.user.login.startsWith("dependabot") && !c.user.login.includes("[bot]"),
+              );
+              if (hasHumanComment) {
+                core.info(`#${pr.number} has human comments, skipping`);
+                continue;
+              }
+              const { data: reviews } = await github.rest.pulls.listReviews({
+                owner: context.repo.owner, repo: context.repo.repo,
+                pull_number: pr.number, per_page: 100,
+              });
+              const hasApproval = reviews.some(
+                (r) => r.state === "APPROVED" && r.user && !r.user.login.includes("[bot]"),
+              );
+              if (hasApproval) {
+                core.info(`#${pr.number} has human approval, skipping`);
+                continue;
+              }
+              const updated = new Date(pr.updated_at).getTime();
+              if (updated > cutoff) {
+                core.info(`#${pr.number} updated ${pr.updated_at}, within ${STALE_DAYS}d, skipping`);
+                continue;
+              }
+              const dep = (pr.title.match(/bump\s+([^ ]+)/i) || [])[1] || "unknown";
+              const body =
+                `Closing as stale: no updates for ${STALE_DAYS}+ days and no human feedback.\n\n` +
+                `Dependabot will open a fresh PR on its next weekly run if the bump is still relevant.\n\n` +
+                `Reopen if you actually need this bump (add the \`keep\` label to prevent auto-close).`;
+              if (DRY_RUN) {
+                core.info(`[dry-run] would close #${pr.number} (${dep})`);
+                closed.push({ n: pr.number, dep, dry: true });
+                continue;
+              }
+              try {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner, repo: context.repo.repo,
+                  issue_number: pr.number, body,
+                });
+                await github.rest.pulls.update({
+                  owner: context.repo.owner, repo: context.repo.repo,
+                  pull_number: pr.number, state: "closed",
+                });
+                core.info(`closed #${pr.number}`);
+                closed.push({ n: pr.number, dep });
+              } catch (err) {
+                core.warning(`failed #${pr.number}: ${err.message}`);
+              }
+            }
+            core.summary
+              .addHeading("Stale Dependabot Auto-Close", 1)
+              .addRaw(`Scanned ${dependabot.length} open dependabot PR(s); closed ${closed.filter((c) => !c.dry).length}.\n\n`)
+              .addTable(closed.map((c) => [{ text: `#${c.n}`, header: true }, { text: c.dep, header: true }, { text: c.dry ? "dry-run" : "closed", header: true }]))
+              .write();
