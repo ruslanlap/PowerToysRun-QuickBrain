@@ -191,7 +191,7 @@ jobs:
           } > checksums.txt
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           name: QuickBrain v${{ steps.get_version.outputs.VERSION }}
           body: ${{ steps.release_notes.outputs.RELEASE_NOTES }}
