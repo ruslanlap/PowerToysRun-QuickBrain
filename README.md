@@ -14,9 +14,10 @@ Access advanced math, unit conversions, date calculations, !!! and AI assistance
 <a href="https://github.com/ruslanlap/PowerToysRun-QuickBrain/releases/latest">
   <img src="https://img.shields.io/github/v/release/ruslanlap/PowerToysRun-QuickBrain?label=latest" alt="Latest Release">
 </a>
-<img src="https://img.shields.io/maintenance/yes/2025" alt="Maintenance">
+<img src="https://img.shields.io/maintenance/yes/2026" alt="Maintenance">
 <img src="https://img.shields.io/badge/C%23-.NET%209.0-512BD4" alt="C# .NET 9.0">
-<img src="https://img.shields.io/badge/version-v1.0.0-brightgreen" alt="Version">
+<img src="https://img.shields.io/badge/version-v1.0.1-brightgreen" alt="Version">
+<a href="https://github.com/ruslanlap/PowerToysRun-QuickBrain/actions/workflows/build-and-release.yml"><img src="https://img.shields.io/github/actions/workflow/status/ruslanlap/PowerToysRun-QuickBrain/build-and-release.yml?branch=master&label=CI" alt="CI"></a>
 <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome">
 <a href="https://github.com/ruslanlap/PowerToysRun-QuickBrain/stargazers">
   <img src="https://img.shields.io/github/stars/ruslanlap/PowerToysRun-QuickBrain" alt="GitHub stars">
@@ -37,10 +38,10 @@ Access advanced math, unit conversions, date calculations, !!! and AI assistance
 </div>
 
 <div align="center">
-  <a href="https://github.com/ruslanlap/PowerToysRun-QuickBrain/releases/download/v1.0.0/QuickBrain-1.0.0-x64.zip">
+  <a href="https://github.com/ruslanlap/PowerToysRun-QuickBrain/releases/download/v1.0.1/QuickBrain-1.0.1-x64.zip">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-x64-blue?style=for-the-badge&logo=github" alt="Download x64">
   </a>
-  <a href="https://github.com/ruslanlap/PowerToysRun-QuickBrain/releases/download/v1.0.0/QuickBrain-1.0.0-arm64.zip">
+  <a href="https://github.com/ruslanlap/PowerToysRun-QuickBrain/releases/download/v1.0.1/QuickBrain-1.0.1-arm64.zip">
     <img src="https://img.shields.io/badge/⬇️_DOWNLOAD-ARM64-blue?style=for-the-badge&logo=github" alt="Download ARM64">
   </a>
 </div>
