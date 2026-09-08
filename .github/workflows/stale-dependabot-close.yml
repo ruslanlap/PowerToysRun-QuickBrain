@@ -33,7 +33,7 @@ jobs:
       DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && 'true' || 'false' }}
     steps:
       - name: List open Dependabot PRs and close the stale ones
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const STALE_DAYS = Number(process.env.STALE_DAYS);
