@@ -17,7 +17,7 @@ Access advanced math, unit conversions, date calculations, !!! and AI assistance
 <img src="https://img.shields.io/maintenance/yes/2026" alt="Maintenance">
 <img src="https://img.shields.io/badge/C%23-.NET%209.0-512BD4" alt="C# .NET 9.0">
 <img src="https://img.shields.io/badge/version-v1.0.1-brightgreen" alt="Version">
-<a href="https://github.com/ruslanlap/PowerToysRun-QuickBrain/actions/workflows/build-and-release.yml"><img src="https://img.shields.io/github/actions/workflow/status/ruslanlap/PowerToysRun-QuickBrain/build-and-release.yml?branch=master&label=CI" alt="CI"></a>
+<a href="https://github.com/ruslanlap/PowerToysRun-QuickBrain/actions/workflows/build-and-release.yml"><img src="https://img.shields.io/github/actions/workflow/status/ruslanlap/PowerToysRun-QuickBrain/build-and-release.yml?event=push&label=Release" alt="Release"></a>
 <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome">
 <a href="https://github.com/ruslanlap/PowerToysRun-QuickBrain/stargazers">
   <img src="https://img.shields.io/github/stars/ruslanlap/PowerToysRun-QuickBrain" alt="GitHub stars">
@@ -82,10 +82,10 @@ Alt+Space → qb date today + 1 week    # 📅 Date calculations
   
   **⬇️ Ready to boost your productivity?**
   
-  <a href="https://github.com/ruslanlap/PowerToysRun-QuickBrain/releases/download/v1.0.0/QuickBrain-1.0.0-x64.zip">
+  <a href="https://github.com/ruslanlap/PowerToysRun-QuickBrain/releases/download/v1.0.1/QuickBrain-1.0.1-x64.zip">
     <img src="https://img.shields.io/badge/Download_for-x64_Windows-0078d4?style=for-the-badge&logo=windows&logoColor=white" alt="Download x64">
   </a>
-  <a href="https://github.com/ruslanlap/PowerToysRun-QuickBrain/releases/download/v1.0.0/QuickBrain-1.0.0-arm64.zip">
+  <a href="https://github.com/ruslanlap/PowerToysRun-QuickBrain/releases/download/v1.0.1/QuickBrain-1.0.1-arm64.zip">
     <img src="https://img.shields.io/badge/Download_for-ARM64_Windows-0078d4?style=for-the-badge&logo=windows&logoColor=white" alt="Download ARM64">
   </a>
 </div>
