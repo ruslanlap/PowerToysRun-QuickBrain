@@ -4,6 +4,15 @@ on:
   schedule:
     - cron: "0 4 * * 1"   # weekly Monday 04:00 UTC
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "List what would be closed without acting"
+        type: boolean
+        default: false
+      stale_days:
+        description: "Days of inactivity before a Dependabot PR is considered stale"
+        type: number
+        default: 14
 
 permissions:
   contents: read
@@ -17,8 +26,11 @@ jobs:
   close:
     runs-on: ubuntu-latest
     env:
-      STALE_DAYS: 14
-      DRY_RUN: "false"
+      # Schedule runs use the schedule default (14). Dispatch runs use the
+      # input value if set, including 0 (must be explicit — `||` would
+      # collapse 0 to the default because of JS truthiness in actions).
+      STALE_DAYS: ${{ github.event_name == 'workflow_dispatch' && inputs.stale_days != null && inputs.stale_days != '' && format('{0}', inputs.stale_days) || '14' }}
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && 'true' || 'false' }}
     steps:
       - name: List open Dependabot PRs and close the stale ones
         uses: actions/github-script@v7
@@ -26,14 +38,22 @@ jobs:
           script: |
             const STALE_DAYS = Number(process.env.STALE_DAYS);
             const DRY_RUN = process.env.DRY_RUN === "true";
-            const KEEP_LABELS = new Set(["keep", "pinned", "do-not-close", "blocked", "in-progress"]);
-            const { data: pulls } = await github.rest.pulls.list({
+            const KEEP_LABELS = new Set([
+              "keep", "pinned", "do-not-close", "blocked", "in-progress",
+              "needs-manual-review",   // flagged by dependabot-auto-merge.yml on Copilot CHANGES_REQUESTED
+            ]);
+            const isHuman = (u) => u && !u.login.endsWith("[bot]") && u.type !== "Bot";
+
+            // github.paginate() walks every page; per_page:100 alone would silently
+            // drop PRs/comments/reviews past the first page. Devin AI review caught this.
+            const pulls = await github.paginate(github.rest.pulls.list, {
               owner: context.repo.owner, repo: context.repo.repo,
               state: "open", per_page: 100,
             });
-            const dependabot = pulls.filter(
-              (pr) => pr.user && pr.user.login.startsWith("dependabot"),
-            );
+            // Exact-match the Dependabot account; a startsWith() match would also
+            // catch impersonator apps like dependabot-fork[bot] on a public repo.
+            const dependabot = pulls.filter((pr) => pr.user && pr.user.login === "dependabot[bot]");
+
             const cutoff = Date.now() - STALE_DAYS * 24 * 60 * 60 * 1000;
             const closed = [];
             for (const pr of dependabot) {
@@ -42,26 +62,25 @@ jobs:
                 core.info(`#${pr.number} has keep-label (${labels.join(",")}), skipping`);
                 continue;
               }
-              const { data: comments } = await github.rest.issues.listComments({
+              const comments = await github.paginate(github.rest.issues.listComments, {
                 owner: context.repo.owner, repo: context.repo.repo,
                 issue_number: pr.number, per_page: 100,
               });
-              const hasHumanComment = comments.some(
-                (c) => c.user && !c.user.login.startsWith("dependabot") && !c.user.login.includes("[bot]"),
-              );
+              const hasHumanComment = comments.some((c) => isHuman(c.user));
               if (hasHumanComment) {
                 core.info(`#${pr.number} has human comments, skipping`);
                 continue;
               }
-              const { data: reviews } = await github.rest.pulls.listReviews({
+              const reviews = await github.paginate(github.rest.pulls.listReviews, {
                 owner: context.repo.owner, repo: context.repo.repo,
                 pull_number: pr.number, per_page: 100,
               });
-              const hasApproval = reviews.some(
-                (r) => r.state === "APPROVED" && r.user && !r.user.login.includes("[bot]"),
-              );
-              if (hasApproval) {
-                core.info(`#${pr.number} has human approval, skipping`);
+              // Any human review (APPROVED, CHANGES_REQUESTED, COMMENTED, DISMISSED)
+              // counts as feedback. Bots (Copilot, Devin, Codex) don't.
+              const hasHumanReview = reviews.some((r) => isHuman(r.user));
+              if (hasHumanReview) {
+                const state = reviews.find((r) => isHuman(r.user)).state;
+                core.info(`#${pr.number} has human review (${state}), skipping`);
                 continue;
               }
               const updated = new Date(pr.updated_at).getTime();
